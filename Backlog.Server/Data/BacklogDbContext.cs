@@ -1,6 +1,7 @@
 ﻿namespace Backlog.Server.Data
 {
     using Backlog.Server.Data.Models;
+    using Backlog.Server.Features.ServiceProtocols.Models;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using ServiceManager.Models;
@@ -11,7 +12,7 @@
         {
         }
 
-        public DbSet<ServiceProtocol> ServiceProtocols { get; set; }
+        public DbSet<IServiceProtocol> ServiceProtocols { get; set; }
         public DbSet<CompanyProfile> CompanyProfile { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32002.261
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlog.Server", "Backlog.Server\Backlog.Server.csproj", "{D8EF00C3-F52A-4AD4-BB93-3A5B0D9D632F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.Server", "Backlog.Server\Backlog.Server.csproj", "{D8EF00C3-F52A-4AD4-BB93-3A5B0D9D632F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backlog.Server.Test", "Backlog.Server.Test\Backlog.Server.Test.csproj", "{76F11381-E74F-4794-A911-B784CF9741DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D8EF00C3-F52A-4AD4-BB93-3A5B0D9D632F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8EF00C3-F52A-4AD4-BB93-3A5B0D9D632F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8EF00C3-F52A-4AD4-BB93-3A5B0D9D632F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76F11381-E74F-4794-A911-B784CF9741DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76F11381-E74F-4794-A911-B784CF9741DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76F11381-E74F-4794-A911-B784CF9741DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76F11381-E74F-4794-A911-B784CF9741DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

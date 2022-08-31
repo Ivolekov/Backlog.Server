@@ -2,11 +2,13 @@
 {
     using Backlog.Server.Data.Models;
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using static Data.Validation.ServiceProtocol;
-    public class ServiceProtocolRequestModel
+    using static Backlog.Server.Data.Validation.ServiceProtocol;
+
+    public class ServiceProtocol : IServiceProtocol
     {
+
+        [Key]
         public int Id { get; set; }
 
         public string ClientEmail { get; set; }
@@ -20,8 +22,10 @@
 
         [Required]
         [MaxLength(MaxBrandModelLength)]
+
         public string BrandModel { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
         public User User { get; set; }
@@ -51,5 +55,7 @@
         public DateTime? DateOfIssue { get; set; }
 
         public string ServicePartsJson { get; set; }
+
+        public int isDeleted { get; set; }
     }
 }

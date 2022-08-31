@@ -36,8 +36,8 @@ namespace Backlog.Server
                .UseEndpoints(endpoints =>
                {
                    endpoints.MapControllers();
-               })
-               .ApplyMigrations();
+               });
+               //.ApplyMigrations();
         }
     }
 }

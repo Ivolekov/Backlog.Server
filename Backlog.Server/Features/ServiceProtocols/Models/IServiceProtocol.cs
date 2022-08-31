@@ -3,9 +3,9 @@
     using Backlog.Server.Data.Models;
     using System;
 
-    public class ServiceProtocolResponseModel
-    {
 
+    public interface IServiceProtocol
+    {
         public int Id { get; set; }
 
         public string ClientEmail { get; set; }
@@ -17,6 +17,8 @@
         public int ServiceProtocolStatusId { get; set; }
 
         public string BrandModel { get; set; }
+
+        public string UserId { get; set; }
 
         public User User { get; set; }
 
@@ -45,5 +47,7 @@
         public DateTime? DateOfIssue { get; set; }
 
         public string ServicePartsJson { get; set; }
+        
+        public int isDeleted { get; set; }
     }
 }

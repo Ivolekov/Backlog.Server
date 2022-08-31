@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
+    using System;
     using System.Threading.Tasks;
 
     public class IdentityController : ApiController
@@ -44,24 +45,34 @@
         [Route(nameof(Login))]
         public async Task<ActionResult<LoginResponseModel>> Login(LoginRequestModel model)
         {
-            var user = await this.userManager.FindByNameAsync(model.UserName);
-            if (user == null)
+            try
             {
-                return Unauthorized();
+                var user = await this.userManager.FindByNameAsync(model.UserName);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                var passwordValid = await this.userManager.CheckPasswordAsync(user, model.Password);
+                if (!passwordValid)
+                {
+                    return Unauthorized();
+                }
+
+                var token = this.identityService.GenerateJwtToken(user.Id, user.UserName, this.appSettings.Secret);
+
+                return new LoginResponseModel
+                {
+                    Token = token
+                };
             }
-
-            var passwordValid = await this.userManager.CheckPasswordAsync(user, model.Password);
-            if (!passwordValid)
+            catch (Exception ex)
             {
-                return Unauthorized();
+                return new LoginResponseModel
+                {
+                    Token = "FaildToken"
+                };
             }
-
-            var token = this.identityService.GenerateJwtToken(user.Id, user.UserName, this.appSettings.Secret);
-
-            return new LoginResponseModel
-            {
-                Token = token
-            };
         }
     }
 }

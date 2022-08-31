@@ -1,5 +1,6 @@
 ﻿namespace Backlog.Server.Data.Models
 {
+    using Backlog.Server.Features.ServiceProtocols.Models;
     using Microsoft.AspNetCore.Identity;
     using ServiceManager.Models;
     using System.Collections.Generic;

@@ -1,24 +1,26 @@
 ﻿namespace Backlog.Server.Features.ServiceProtocols
 {
-    using Backlog.Server.Infrastructure;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Mvc;
+    using Backlog.Server.Utilities;
     using Backlog.Server.Data.Models;
     using System.Collections.Generic;
+    using Backlog.Server.Infrastructure;
+    using Microsoft.AspNetCore.Authorization;
     using Backlog.Server.Features.ServiceProtocols.Models;
-
+    
     [Authorize]
     public class ServiceProtocolsController : ApiController
     {
         private readonly IServiceProtocolService serviceProtocolService;
+
         public ServiceProtocolsController(IServiceProtocolService serviceProtocolService) 
         {
             this.serviceProtocolService = serviceProtocolService;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Create(ServiceProtocolRequestModel model)
+        public async Task<IActionResult> Create(IServiceProtocol model)
         {
 
             var userId = this.User.GetId();
@@ -46,12 +48,12 @@
             };
 
             var serviceProtocolResult = await this.serviceProtocolService.CreateServiceProtocol(serviceProtocol);
-
+            
             return Created(nameof(this.Create), serviceProtocolResult.Id);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ServiceProtocolListResponseModel>> GetList()
+        public async Task<ActionResult<IEnumerable<ServiceProtocolListResponseModel>>> GetList()
         {
             var serviceprotocols = new List<ServiceProtocolListResponseModel>();
             var resultCollection = await serviceProtocolService.GetServiceProtocolsList(this.User.GetId());
@@ -69,165 +71,114 @@
                 };
                 serviceprotocols.Add(result);
             }
-            return serviceprotocols;
+            return Ok(serviceprotocols);
         }
 
         [Route("{id}")]
         [HttpPut]
-        public async Task<ActionResult> Edit(int id, ServiceProtocolRequestModel model)
+        public async Task<IActionResult> Edit(int id, IServiceProtocol model)
         {
             if (id != model.Id)
             {
 
-                return BadRequest("Not a valid service protocol id");
+                return BadRequest(Messages.NotValidServiceProtocolId);
             }
 
-            var serviceProtocol = new ServiceProtocol()
-            {
-                Id = model.Id,
-                Bag = model.Bag,
-                BrandModel = model.BrandModel,
-                Charger = model.Charger,
-                ClientEmail = model.ClientEmail,
-                ClientPhone = model.ClientPhone,
-                Comment = model.Comment,
-                DateOfIssue = model.DateOfIssue,
-                FaultInformation = model.FaultInformation,
-                FinalPrice = model.FinalPrice,
-                LockPattern = model.LockPattern,
-                Other = model.Other,
-                Pin = model.Pin,
-                ServiceAction = model.ServiceAction,
-                ServiceProtocolStatusId = model.ServiceProtocolStatusId,
-                SimTray = model.SimTray,
-                UnlockPass = model.UnlockPass,
-                ServicePartsJson = model.ServicePartsJson,
-                UserId = this.User.GetId()
-            };
+            model.UserId = this.User.GetId();
 
-            var currentProtocol = await serviceProtocolService.GetServiceProtocolById(serviceProtocol.Id);
-            if (currentProtocol.UserId != serviceProtocol.UserId)
+            var currentProtocol = await serviceProtocolService.GetServiceProtocolById(model.Id);
+            
+            if (currentProtocol.UserId != model.UserId)
             {
-                return Unauthorized("Not a valid user");
+                return Unauthorized(Messages.Unauthorized);
             }
 
-            await serviceProtocolService.UpdateServiceProtocol(serviceProtocol);
+            await serviceProtocolService.UpdateServiceProtocol(model);
 
             return NoContent();
         }
 
         [Route("{id}")]
         [HttpGet]
-        public async Task<ActionResult<ServiceProtocolResponseModel>> GetById(int id)
+        public async Task<ActionResult<IServiceProtocol>> GetById(int protocolId)
         {
-            var serviceProtocol = await serviceProtocolService.GetServiceProtocolById(id);
+            var serviceProtocol = await serviceProtocolService.GetServiceProtocolById(protocolId);
 
             if (serviceProtocol == null)
             {
-                return NotFound();
+                return NotFound(string.Format(Messages.NotFoundWithId, protocolId));
+            }
+            else if (serviceProtocol.UserId != this.User.GetId())
+            {
+                return Unauthorized(Messages.Unauthorized);
             }
 
-            if (serviceProtocol.UserId != this.User.GetId())
-            {
-                return Unauthorized("Not a valid user");
-            }
-
-            var result = new ServiceProtocolResponseModel()
-            {
-                Id = serviceProtocol.Id,
-                ClientPhone = serviceProtocol.ClientPhone,
-                ClientEmail = serviceProtocol.ClientEmail,
-                BrandModel = serviceProtocol.BrandModel,
-                Comment = serviceProtocol.Comment,
-                C_DateTime = serviceProtocol.C_DateTime,
-                Bag = serviceProtocol.Bag,
-                Charger = serviceProtocol.Charger,
-                DateOfIssue = serviceProtocol.DateOfIssue,
-                FaultInformation = serviceProtocol.FaultInformation,
-                FinalPrice = serviceProtocol.FinalPrice,
-                LockPattern = serviceProtocol.LockPattern,
-                Other = serviceProtocol.Other,
-                Pin = serviceProtocol.Pin,
-                ServiceAction = serviceProtocol.ServiceAction,
-                ServiceProtocolStatusId = serviceProtocol.ServiceProtocolStatusId,
-                SimTray = serviceProtocol.SimTray,
-                UnlockPass = serviceProtocol.UnlockPass,
-                User = serviceProtocol.User,
-                ServicePartsJson = serviceProtocol.ServicePartsJson
-            };
-
-            return Ok(result);
+            return Ok(serviceProtocol);
         }
 
         [Route(nameof(Search) + "/{input}")]
         [HttpGet]
-        public async Task<IEnumerable<ServiceProtocolResponseModel>> Search(string input)
+        public async Task<ActionResult<IEnumerable<ServiceProtocolListResponseModel>>> Search(string input)
         {
-            var serviceprotocols = new List<ServiceProtocolResponseModel>();
+            var serviceprotocols = new List<ServiceProtocolListResponseModel>();
             var resultCollection = await serviceProtocolService.Search(input, this.User.GetId());
+
             foreach (var item in resultCollection)
             {
-                var result = new ServiceProtocolResponseModel()
+                var result = new ServiceProtocolListResponseModel()
                 {
                     Id = item.Id,
-                    Bag = item.Bag,
                     BrandModel = item.BrandModel,
-                    Charger = item.Charger,
-                    ClientEmail = item.ClientEmail,
                     ClientPhone = item.ClientPhone,
-                    Comment = item.Comment,
                     C_DateTime = item.C_DateTime,
                     DateOfIssue = item.DateOfIssue,
-                    FaultInformation = item.FaultInformation,
                     FinalPrice = item.FinalPrice,
-                    LockPattern = item.LockPattern,
-                    Other = item.Other,
-                    Pin = item.Pin,
-                    ServiceAction = item.ServiceAction,
-                    ServiceProtocolStatusId = item.ServiceProtocolStatusId,
-                    SimTray = item.SimTray,
-                    UnlockPass = item.UnlockPass,
-                    User = item.User
+                    ServiceProtocolStatusId = item.ServiceProtocolStatusId
                 };
+
                 serviceprotocols.Add(result);
             }
-            return serviceprotocols;
+           
+            return Ok(serviceprotocols);
         }
 
         [Route("{id}/{statusid}")]
         [HttpPut]
-        public async Task<ActionResult> SetStatus(int id, int statusId)
+        public async Task<ActionResult> SetStatus(int serviceProtocolId, int serviceProtocolStatusId)
         {
-            var protocol = await this.serviceProtocolService.GetServiceProtocolById(id);
+            var protocol = await this.serviceProtocolService.GetServiceProtocolById(serviceProtocolId);
+            
             if (protocol.UserId != this.User.GetId())
             {
-                return Unauthorized("Not a valid user");
+                return Unauthorized(Messages.Unauthorized);
             }
-            await serviceProtocolService.SetServiceProtocolStatus(id, statusId);
-            return Accepted("The status was updated.");
+
+            await serviceProtocolService.SetServiceProtocolStatus(serviceProtocolId, serviceProtocolStatusId);
+
+            return Accepted(Messages.StatusWasUpdated);
         }
 
         [HttpDelete("{protocolId}")]
-        public async Task<ActionResult> DeleteServiceProtocol(int protocolId) 
+        public async Task<IActionResult> DeleteServiceProtocol(int protocolId)
         {
             if (protocolId == 0)
             {
-                return BadRequest("Not a valid service protocol id");
+                return BadRequest(Messages.NotValidServiceProtocolId);
             }
 
-            var protocol = await this.serviceProtocolService.GetServiceProtocolById(protocolId);
-            if (protocol.UserId != this.User.GetId())
-            {
-                return Unauthorized("Not a valid user");
-            }
-
-            var currentServiceProtocol = await serviceProtocolService.GetServiceProtocolById(protocolId);
+            var currentServiceProtocol = await this.serviceProtocolService.GetServiceProtocolById(protocolId);
+           
             if (currentServiceProtocol == null)
             {
                 return NotFound($"The service protocol {protocolId} not exist.");
             }
+            else if (currentServiceProtocol.UserId != this.User.GetId())
+            {
+                return Unauthorized(Messages.Unauthorized);
+            }
 
             await serviceProtocolService.SetServiceProtocolDeleteFlag(protocolId, 1);
+            
             return NoContent();
         }
     }

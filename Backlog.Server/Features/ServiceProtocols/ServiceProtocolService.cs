@@ -2,6 +2,7 @@
 {
     using Backlog.Server.Data;
     using Backlog.Server.Data.Models;
+    using Backlog.Server.Features.ServiceProtocols.Models;
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
@@ -26,7 +27,7 @@
             }
         }
 
-        public async Task<ServiceProtocol> CreateServiceProtocol(ServiceProtocol serviceProtocol)
+        public async Task<IServiceProtocol> CreateServiceProtocol(IServiceProtocol serviceProtocol)
         {
             try
             {
@@ -42,7 +43,7 @@
             }
         }
 
-        public async Task DeleteServiceProtocol(ServiceProtocol serviceProtocol)
+        public async Task DeleteServiceProtocol(IServiceProtocol serviceProtocol)
         {
             try
             {
@@ -56,12 +57,11 @@
             }
         }
 
-        public async Task<ServiceProtocol> GetServiceProtocolById(int id)
+        public async Task<IServiceProtocol> GetServiceProtocolById(int id)
         {
             try
             {
-                var serviceProtocol = await context.ServiceProtocols.Where(x => x.Id == id && x.isDeleted == 0).FirstOrDefaultAsync();
-                return serviceProtocol;
+                return await context.ServiceProtocols.Where(x => x.Id == id && x.isDeleted == 0).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -69,7 +69,7 @@
             }
         }
 
-        public async Task<IEnumerable<ServiceProtocol>> GetServiceProtocolsList(string userId)
+        public async Task<IEnumerable<IServiceProtocol>> GetServiceProtocolsList(string userId)
         {
             try
             {
@@ -81,7 +81,7 @@
             }
         }
 
-        public async Task<IEnumerable<ServiceProtocol>> Search(string input, string userId)
+        public async Task<IEnumerable<IServiceProtocol>> Search(string input, string userId)
         {
             try
             {
@@ -93,7 +93,7 @@
             }
         }
 
-        public async Task UpdateServiceProtocol(ServiceProtocol serviceProtocol)
+        public async Task UpdateServiceProtocol(IServiceProtocol serviceProtocol)
         {
             try
             {
