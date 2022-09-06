@@ -5,6 +5,8 @@
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using ServiceManager.Models;
+    using System.Collections.Generic;
+
     public class BacklogDbContext : IdentityDbContext<User>
     {
         public BacklogDbContext(DbContextOptions<BacklogDbContext> options)
@@ -12,7 +14,7 @@
         {
         }
 
-        public DbSet<IServiceProtocol> ServiceProtocols { get; set; }
+        public DbSet<ServiceProtocol> ServiceProtocols { get; set; }
         public DbSet<CompanyProfile> CompanyProfile { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

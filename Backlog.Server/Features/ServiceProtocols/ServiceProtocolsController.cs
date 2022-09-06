@@ -20,7 +20,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(IServiceProtocol model)
+        public async Task<IActionResult> Create(ServiceProtocol model)
         {
 
             var userId = this.User.GetId();
@@ -74,11 +74,11 @@
             return Ok(serviceprotocols);
         }
 
-        [Route("{id}")]
+        [Route("{protocolId}")]
         [HttpPut]
-        public async Task<IActionResult> Edit(int id, IServiceProtocol model)
+        public async Task<IActionResult> Edit(int protocolId, ServiceProtocol model)
         {
-            if (id != model.Id)
+            if (protocolId != model.Id)
             {
 
                 return BadRequest(Messages.NotValidServiceProtocolId);
@@ -98,7 +98,7 @@
             return NoContent();
         }
 
-        [Route("{id}")]
+        [Route("{protocolId}")]
         [HttpGet]
         public async Task<ActionResult<IServiceProtocol>> GetById(int protocolId)
         {
@@ -142,13 +142,16 @@
             return Ok(serviceprotocols);
         }
 
-        [Route("{id}/{statusid}")]
+        [Route("{serviceProtocolId}/{serviceProtocolStatusId}")]
         [HttpPut]
-        public async Task<ActionResult> SetStatus(int serviceProtocolId, int serviceProtocolStatusId)
+        public async Task<IActionResult> SetStatus(int serviceProtocolId, int serviceProtocolStatusId)
         {
             var protocol = await this.serviceProtocolService.GetServiceProtocolById(serviceProtocolId);
-            
-            if (protocol.UserId != this.User.GetId())
+            if (protocol == null)
+            {
+                return NotFound(string.Format(Messages.NotFoundWithId, serviceProtocolId));
+            }
+            else if (protocol.UserId != this.User.GetId())
             {
                 return Unauthorized(Messages.Unauthorized);
             }

@@ -43,9 +43,9 @@ namespace Backlog.Server.Test
         public void Create_StatusCode_201_Created()
         {
             //Arrange
-            var fakeObj = A.Fake<IServiceProtocol>();
+            var fakeObj = A.Fake<ServiceProtocol>();
             int expectedStatus = (int)HttpStatusCode.Created;
-            A.CallTo(() => fakeService.CreateServiceProtocol(A<IServiceProtocol>.Ignored)).Returns(A.Fake<ServiceProtocol>());
+            A.CallTo(() => fakeService.CreateServiceProtocol(A<ServiceProtocol>.Ignored)).Returns(A.Fake<ServiceProtocol>());
 
             //Act
             var response = controller.Create(fakeObj);
@@ -94,16 +94,16 @@ namespace Backlog.Server.Test
         public void Edit_StatusCode_400_BadRequest()
         {
             //Arrange
-            var fakeObj = A.Fake<IServiceProtocol>();
+            var fakeObj = A.Fake<ServiceProtocol>();
             var id = rnd.Next(1,1000);
-            A.CallTo(() => fakeService.CreateServiceProtocol(A<IServiceProtocol>.Ignored)).Returns(new ServiceProtocol { Id = id });
+            A.CallTo(() => fakeService.CreateServiceProtocol(A<ServiceProtocol>.Ignored)).Returns(new ServiceProtocol { Id = id });
             var createResponse = controller.Create(fakeObj);
             var actualCreateResult = createResponse.Result as CreatedResult;
             var actualId = int.Parse(actualCreateResult.Value.ToString());
             int expectedStatus = (int)HttpStatusCode.BadRequest;
 
             //Act
-            var response = controller.Edit(actualId, A.Fake<IServiceProtocol>());
+            var response = controller.Edit(actualId, A.Fake<ServiceProtocol>());
             var actualResult = response.Result as BadRequestObjectResult;
             var actualResultMsg = actualResult.Value;
 
@@ -119,7 +119,7 @@ namespace Backlog.Server.Test
             int expectedStatus = (int)HttpStatusCode.Unauthorized;
 
             //Act
-            var response = controller.Edit(0, A.Fake<IServiceProtocol>());
+            var response = controller.Edit(0, A.Fake<ServiceProtocol>());
             var actualResult = response.Result as UnauthorizedObjectResult;
             var actualResultMsg = actualResult.Value;
 
@@ -136,7 +136,7 @@ namespace Backlog.Server.Test
             A.CallTo(() => fakeService.GetServiceProtocolById(A<int>._)).Returns(new ServiceProtocol { UserId = "1" });
 
             //Act
-            var response = controller.Edit(0, A.Fake<IServiceProtocol>());
+            var response = controller.Edit(0, A.Fake<ServiceProtocol>());
             var actualResult = response.Result as NoContentResult;
 
             //Assert
@@ -229,6 +229,22 @@ namespace Backlog.Server.Test
         }
 
         [Test]
+        public void SetStatus_StatusCode_404_NotFound()
+        {
+            //Arrange
+            int expectedStatus = (int)HttpStatusCode.NotFound;
+            int serviceProtocolId = rnd.Next(1, 1000);
+            A.CallTo(() => fakeService.GetServiceProtocolById(A<int>.Ignored)).Returns(new ServiceProtocol().Id == 0 ? null : new ServiceProtocol());
+
+            //Act
+            var response = controller.SetStatus(1, 1);
+            var actualResult = response.Result as NotFoundObjectResult;
+
+            //Assert
+            Assert.That(actualResult.StatusCode, Is.EqualTo(expectedStatus));
+        }
+
+        [Test]
         public void SetStatus_StatusCode_401_Unauthorized() 
         {
             //Arrange
@@ -265,8 +281,8 @@ namespace Backlog.Server.Test
         public void DeleteServiceProtocol_StatusCode_400_BadRequest() 
         {
             //Arrange
-            var fakeObj = A.Fake<IServiceProtocol>();
-            A.CallTo(() => fakeService.CreateServiceProtocol(A<IServiceProtocol>.Ignored)).Returns(new ServiceProtocol());
+            var fakeObj = A.Fake<ServiceProtocol>();
+            A.CallTo(() => fakeService.CreateServiceProtocol(A<ServiceProtocol>.Ignored)).Returns(new ServiceProtocol());
             var createResponse = controller.Create(fakeObj);
             var actualCreateResult = createResponse.Result as CreatedResult;
             var actualId = int.Parse(actualCreateResult.Value.ToString());
@@ -320,9 +336,9 @@ namespace Backlog.Server.Test
         public void DeleteServiceProtocol_StatusCode_204_NoContent_SuccessfullyDeleted()
         {
             //Arrange
-            var fakeObj = A.Fake<IServiceProtocol>();
+            var fakeObj = A.Fake<ServiceProtocol>();
             var id = 123;
-            A.CallTo(() => fakeService.CreateServiceProtocol(A<IServiceProtocol>.Ignored)).Returns(new ServiceProtocol { Id = id });
+            A.CallTo(() => fakeService.CreateServiceProtocol(A<ServiceProtocol>.Ignored)).Returns(new ServiceProtocol { Id = id });
             A.CallTo(() => fakeService.GetServiceProtocolById(A<int>._)).Returns(new ServiceProtocol { UserId = "1" });
             var createResponse = controller.Create(fakeObj);
             var actualCreateResult = createResponse.Result as CreatedResult;

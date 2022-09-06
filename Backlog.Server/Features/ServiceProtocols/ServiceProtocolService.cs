@@ -27,7 +27,7 @@
             }
         }
 
-        public async Task<IServiceProtocol> CreateServiceProtocol(IServiceProtocol serviceProtocol)
+        public async Task<IServiceProtocol> CreateServiceProtocol(ServiceProtocol serviceProtocol)
         {
             try
             {
@@ -43,7 +43,7 @@
             }
         }
 
-        public async Task DeleteServiceProtocol(IServiceProtocol serviceProtocol)
+        public async Task DeleteServiceProtocol(ServiceProtocol serviceProtocol)
         {
             try
             {
@@ -57,7 +57,7 @@
             }
         }
 
-        public async Task<IServiceProtocol> GetServiceProtocolById(int id)
+        public async Task<ServiceProtocol> GetServiceProtocolById(int id)
         {
             try
             {
@@ -93,11 +93,13 @@
             }
         }
 
-        public async Task UpdateServiceProtocol(IServiceProtocol serviceProtocol)
+        public async Task UpdateServiceProtocol(ServiceProtocol serviceProtocol)
         {
             try
             {
                 serviceProtocol.C_DateTime = DateTime.Now;
+                var sp = await GetServiceProtocolById(serviceProtocol.Id);
+                context.Entry(sp).State = EntityState.Detached;
                 context.ServiceProtocols.Update(serviceProtocol);
                 await context.SaveChangesAsync();
             }
